@@ -1,0 +1,3 @@
+/home/lei/Documents/uba/algo3/TPs/tp1/build/CMakeFiles/edit_cache.dir
+/home/lei/Documents/uba/algo3/TPs/tp1/build/CMakeFiles/rebuild_cache.dir
+/home/lei/Documents/uba/algo3/TPs/tp1/build/CMakeFiles/Escritorio.dir

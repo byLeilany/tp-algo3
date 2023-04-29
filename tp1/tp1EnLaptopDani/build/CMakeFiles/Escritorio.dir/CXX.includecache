@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/lei/Documents/uba/algo3/TPs/tp1/ejer1.cpp
+iostream
+-
+cmath
+-
+math.h
+-
+vector
+-
+

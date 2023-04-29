@@ -1,0 +1,1 @@
+/usr/bin/c++  -g  -rdynamic CMakeFiles/Escritorio.dir/ejer1.cpp.o  -o Escritorio 
