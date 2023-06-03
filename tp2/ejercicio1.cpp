@@ -12,29 +12,23 @@ int M;
 //funciones de grafos
 
 
- set<int> vecinos(vector<set<int>> g, nodo n){
-    //vector<int> v;
-    // for (int i = 0 ; i < g[n].size(); i++){
-    //   if (g[n][i] == 1){
-    //        v.push_back(i);
-    //  }
-    //}
+ set<nodo> vecinos(vector<set<nodo>> g, nodo n){
     return g[n];
 }
 
 
-int cantnodos(vector<set<int>> g){
+int cantnodos(vector<set<nodo>> g){
     return g.size();
 }
 
 
-void quitararista(vector<set<int>>& g, nodo u, nodo w){
+void quitararista(vector<set<nodo>>& g, nodo u, nodo w){
     // g[u][w] = 0;
     g[u].erase(w);
     g[w].erase(u);
 }
 
-void ponerarista(vector<set<int>> g, nodo u, nodo w){
+void ponerarista(vector<set<nodo>> g, nodo u, nodo w){
     // g[u][w] = 1;
     g[u].insert(w);
     g[w].insert(u);
@@ -53,19 +47,19 @@ void ponerarista(vector<set<int>> g, nodo u, nodo w){
 int NO_LO_VI = 0; 
 int EMPECE_A_VER = 1;
 int TERMINE_DE_VER = 2;
-vector<int> estado; //init en NO_LO_VI
+vector<int> estado(0); //init en NO_LO_VI
 
 
 
-vector<int> backConExtremoInferiorEn;
-vector<int> backConExtremoSuperiorEn;
-vector<set<int>> grafo;
-vector<int> padre;
-vector<set<int>> treeEdges; //init en []
+vector<int> backConExtremoInferiorEn(0);
+vector<int> backConExtremoSuperiorEn(0);
+vector<set<nodo>> grafo(0);
+vector<nodo> padre(0);
+vector<set<nodo>> treeEdges(0); //init en []
 
-void dfs(int v, int p) {
+void dfs(nodo v, nodo p) {
     estado[v] = EMPECE_A_VER;
-    for (int u : grafo[v]) {
+    for (nodo u : grafo[v]) {
         if (estado[u] == NO_LO_VI) {
             treeEdges[v].insert(u);
             padre[u] = v;
@@ -80,18 +74,15 @@ void dfs(int v, int p) {
 } 
 
 
-vector<int> memo; //init en -1
-int cubren(int v, int p = -1) {
-
-    vector <int> debug = backConExtremoInferiorEn;
-    vector <int> debug1 = backConExtremoSuperiorEn;
+vector<int> memo(0); //init en -1
+int cubren(nodo v, nodo p = -1) {
 
     if (memo[v] != -1) return memo[v];
     int res = 0;
     res += backConExtremoInferiorEn[v];
     res -= backConExtremoSuperiorEn[v];
 
-    for (int hijo : treeEdges[v]) if (hijo != p) {
+    for (nodo hijo : treeEdges[v]) if (hijo != p) {
         res += cubren(hijo, v);
     }
 
@@ -101,9 +92,9 @@ int cubren(int v, int p = -1) {
 
 
 
-vector< tuple<int,int>> aristaspuente ;
+vector<tuple<nodo,nodo>> aristaspuente(0);
 
-void cantpuentes(vector<set<int>>& g){
+void cantpuentes(vector<set<nodo>>& g){
     for (int i = 0;i < estado.size();i++) {
         if (estado[i] != TERMINE_DE_VER) {
             padre[i] = i;
@@ -131,14 +122,14 @@ void cantpuentes(vector<set<int>>& g){
 
 
 
-vector<int> estadov2;
-vector<set<int>> componentesconnodo; 
+vector<int> estadov2(0);
+vector<set<nodo>> componentesconnodo(0); 
 
 
 
-void dfsv2(vector<set<int>>& g ,int v, int p, int comp) {
+void dfsv2(vector<set<nodo>>& g ,nodo v, nodo p, nodo comp) {
     estadov2[v] = EMPECE_A_VER;
-    for (int u : g[v]) {
+    for (nodo u : g[v]) {
         if (estadov2[u] == NO_LO_VI) {
             componentesconnodo[comp].insert(u);
             dfsv2(g, u, v,comp);
@@ -150,10 +141,11 @@ void dfsv2(vector<set<int>>& g ,int v, int p, int comp) {
 
 
 
-void componentesseparadas(vector<set<int>>& g){
+void componentesseparadas(vector<set<nodo>>& g){
     int cantcomp = 0;    
     for (int i = 0;i < estadov2.size();i++) {
         if (estadov2[i] == NO_LO_VI) {
+            componentesconnodo.push_back({});
             componentesconnodo[cantcomp].insert(i);
             dfsv2(g ,i,-1, cantcomp);    // ver como entra tipo orden capaz bug
             cantcomp ++;
@@ -163,7 +155,7 @@ void componentesseparadas(vector<set<int>>& g){
 
 
 
-vector<double> memfac;
+vector<double> memfac(0);
 double factorial(double n ){
     if( n == 1){
         return 1;
@@ -178,18 +170,15 @@ double factorial(double n ){
     return temp;
 } 
 
-double cuentaparaprobabilidad(vector<set<int>> componentes){
-    double formasdganar = 0;
-    for (int i = 0;i < componentes.size();i++){
-        double tamano = componentes[i].size(); 
-        if ( tamano >= 2 ){
-           
+
+long long probaParaGanar(vector<set<nodo>> componentes){
+     long long formasdganar = 0;
+    for (int i = 0; i < componentes.size();i++){
+        long long tamano = componentes[i].size(); 
+        if (tamano >= 2){
             formasdganar += (tamano*(tamano-1))/2;
         }
     }
-
-    // double formasdejjugar =  double(cantnodos*(cantnodos-1))*0.5;
-
 
     return formasdganar;
 }
@@ -199,73 +188,49 @@ double cuentaparaprobabilidad(vector<set<int>> componentes){
 
 
 int main(){
-    for(int i = 1; i < 100; i++){
-        cout << i << " " << i+1 << "   ";
-    }
-    cout << 100 << " " << 1 << " ";
-    for(int i = 101; i < 200; i++){
-        cout << i << " " << i+1 << " ";
-    }
-    cout << 101 << " " << 200 << " ";
-
 
     cin >> N; 
 
-    vector<int> copia(N,-1);
-    memo = copia;   // para la prgramacion dinamica
-    vector<set<int>> grafo1(N);
-    componentesconnodo = grafo1;
-    vector<int> copia2(N + 1,-1);
-    vector<double> copiad(N + 1,-1);
-    memfac = copiad;
 
+    memo = vector<int>(N, -1);   // para la prgramacion dinamica
+    grafo = vector<set<nodo>>(N);
+    treeEdges = grafo;
 
     cin >> M;
 
-
-
-
-    vector <bool> vistcopia(N,0);
   
-    vector <int> estcopia(N,0);
-    estado = estcopia;
-    estadov2 = estcopia;
-    padre = estcopia;
-    backConExtremoInferiorEn = estcopia;
-    backConExtremoSuperiorEn = estcopia;
+    estado = vector<int>(N,0);
+    estadov2 = vector<int>(N,0);
+    backConExtremoInferiorEn = vector<int>(N,0);
+    backConExtremoSuperiorEn = vector<int>(N,0);
+    padre = vector<nodo>(N,0);
 
 
-    treeEdges = grafo1;
-
-
-
-    int u = 0;
-    int w = 0;
+    nodo u = 0;
+    nodo w = 0;
     for(int i = 0; i < M ; i++){   //esta mal inicializado capaz nose aiuda nose contar
         cin >> u;
         cin >> w;
-        grafo1[u - 1].insert(w - 1);
-        grafo1[w - 1].insert(u - 1);
+        grafo[u - 1].insert(w - 1);
+        grafo[w - 1].insert(u - 1);
     }
-    grafo = grafo1;
-    cantpuentes(grafo1);   //saco los puntes
-    componentesseparadas(grafo1);
+    cantpuentes(grafo);   //saco los puntes
+    componentesseparadas(grafo);
 
-    vector<set<int>> debug = componentesconnodo;
-    double p = 0;
-    p = cuentaparaprobabilidad(componentesconnodo);
-        
-        
+    long long p = probaParaGanar(componentesconnodo);       
+    long long cantnodos = grafo.size();
 
-    int cantnodos = grafo.size();
-
-    double formasdejjugar =  double(cantnodos*(cantnodos-1))/2;
+    double formasdejjugar =  (cantnodos*(cantnodos-1))*0.5;
    
-    double res = 1 - (p/formasdejjugar) ; 
+    double res = 1 - ((p*1.0)/formasdejjugar) ; 
     std::cout << std::fixed;
-    std::cout << std::setprecision(5) << res;
+    std::cout << std::setprecision(5) << res ;
 }
 
-/* el del coso quimico anda
+/* el del coso quimico anda4 4
 10 11 1 2 1 7 1 10 10 9 7 8 8 9 2 3 2 6 6 5 5 4 4 3
+
+
+4 4 1 2 1 3 1 4 2 4
+
 */

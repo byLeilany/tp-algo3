@@ -1,11 +1,10 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-using ll = long long;
-const ll inf = 1e18;
+using ll = int;
 
-ll resU;
-ll resV;
+double resU;
+double resV;
 
 /*
 W = #modems
@@ -34,15 +33,17 @@ ll snd(tuple<ll, ll> e){
     return get<1>(e);
 }
 
-ll dist(tuple<ll,ll> d1, tuple<ll,ll> d2){
-    return abs(fst(d1) - fst(d2)) + abs(snd(d1) - snd(d2));
+double dist(tuple<ll,ll> d1, tuple<ll,ll> d2){
+    ll a = fst(d1) - fst(d2);
+    ll b = snd(d1) - snd(d2);
+    return sqrt( a*a + b*b);
 }
 
-using nodo = ll;
-vector<tuple<ll, int, int>> E; // (dist, UTP?, i, f)
+
+vector<tuple<double, int, int>> E(0); // (dist, UTP?, i, f)
 
 int cantCasos;
-int N; ll R; int W; ll U; ll V;
+int N; double R; int W; double U; double V;
 
 
 //jaja gracias julian, sos un capo
@@ -75,17 +76,20 @@ void kruskal(int Wi){
     sort(E.begin(),E.end());
     int aristas = 0;
     DSU dsu(N);
-    for(auto [d,u,v] : E){
+    for(tuple<double, int, int> e : E){ //duv
         if(Wi > W){
+            double d = get<0>(e);
+            int u = get<1>(e);
+            int v = get<2>(e);
             //si (u,v) es arista segura
             if(dsu.find(u) != dsu.find(v)){
                 // agregar
                 dsu.unite(u,v);
                 aristas++;
-                if(d <= R || U==V){
-                    resU += d*U;
+                if(d <= R){
+                    resU += d;
                 }else{
-                    resV += d*V;
+                    resV += d;
                 }
                 Wi--;
             }
@@ -101,7 +105,7 @@ int main(){
       while(itCasos <= cantCasos){
         resU = 0;
         resV = 0;
-        E = vector<tuple<ll, int, int>>(0);
+        E = vector<tuple<double, int, int>>(0);
 
         cin >> N >> R >> W >> U >> V;
         
@@ -119,19 +123,21 @@ int main(){
 
             for(int h = k + 1; h < coord.size(); h++){
                 tuple<ll, ll> dSig = coord[h];
-                ll d = dist(dSig, dActual);
+                double d = dist(dSig, dActual);
                 E.push_back({d, k, h});
 
             }
         }
 
         kruskal(N);
+        resU = resU*U;
+        resV = resV*V;
         std::cout << std::fixed;
-        if(itCasos == cantCasos){
-            cout<<"Caso #" << itCasos <<": "<< std::setprecision(3) << double(resU) << " " << std::setprecision(3) << double(resV) << " ";
-        }else{
-            cout<<"Caso #" << itCasos <<": "<< std::setprecision(3) << double(resU) << " " << std::setprecision(3) << double(resV) << " " <<endl;
-        }
+        // if(itCasos == cantCasos){
+        //     cout<<"Caso #" << itCasos <<": "<< std::setprecision(3) << double(resU) << " " << std::setprecision(3) << double(resV);
+        // }else{
+            cout<<"Caso #" << itCasos <<": "<< std::setprecision(3) << resU << " " << std::setprecision(3) << resV <<endl;
+        // }
         itCasos++;
       }
 }
