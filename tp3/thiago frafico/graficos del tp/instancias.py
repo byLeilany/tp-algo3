@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import random
 import os
+import math
 
 current_directory = os.getcwd()
 
@@ -12,10 +13,17 @@ print(current_directory)
 
 for power in range(2, 13):
     n = 2 ** power
-    f = open("graficos del tp/input/input" + str(n) , "w")
+    f = open("/home/dani/Documents/uba/algo3/tp-algo3/tp3_estoSeTerminaHoy/thiago frafico/graficos del tp/input/input" + str(n) , "w")
     
     na = n-1
-    m = random.randint(1,(n*n )-2*n )
+    #ralo
+    # hasta = math.pow(n, 1.3)
+    # m = random.randint(1, min(1e5,int(hasta)))
+
+    #denso
+    m = min(1e5 , int((n)*(n-1)//2)) #random.randint(n, min(1e5 ,(n)*(n-1)//2))
+    m = int(m)
+
     input = range(0, m )
     k = random.randint(1,min(n * n,300))
     input2 = range(0, k)
