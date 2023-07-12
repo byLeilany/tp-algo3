@@ -9,7 +9,7 @@ using nodo = tuple<ll,ll>; //peso, nombre
 using grafo = vector<set<nodo>>; //peso, nombre
 using calleBi = tuple<ll,ll, ll>; //peso, nombre
 
-ll N, M; 
+ll N, M;
 int k, s, t;
 
 grafo Grafo;
@@ -25,7 +25,7 @@ ll cantnodos(grafo g)
     return g.size();
 }
 
-ll nombre(auto n)
+ll nombre(auto  n)
 {
     return get<1>(n);
 }
@@ -43,55 +43,34 @@ ll llegada(auto n)
 //
 
 
-class comparoD
-{
-    vector<ll>* dPun;   
-    public:
-    comparoD(vector<ll>* param=&d){dPun=param;}
-    bool operator() (const int& lhs, const int&rhs) const
-    {
-        return ((*dPun)[lhs]>(*dPun)[rhs]); //SI FUNCIONA MAL, CAMBIAR EL > por un <
-    }
-};
-// typedef std::priority_queue<ll,std::vector<ll>,mycomparison> miTipo;
-
-//DIJKSTRA
-void init(grafo &g, ll s, vector<ll> &d)
-{
-    for(int i  = 0; i < d.size(); i++)
-    {
-        d[i] = inf;
-    }
-    d[s] = 0;
-}
-
 
 void relax(ll u, nodo v, vector<ll>& d){
     if(d[nombre(v)] > d[u] + peso(v)){
-        d[nombre(v)] = d[u] + peso(v); 
+        d[nombre(v)] = d[u] + peso(v);
         // DECREsEKEY?DEL QUEUEUUE
     }
 }
 
 void dijkstra(grafo& g, ll s, vector<ll>& d){
-    init(g, s, d);
-    priority_queue<ll,std::vector<ll>,comparoD> q; // (mycomparison(d));
+    //init(g, s, d);
+    d[s] = 0;
+   priority_queue<nodo,std::vector<nodo>,greater<nodo>> q;
+    q.push(make_tuple(0,s)) ;
 
-    for(ll i  = 0; i < d.size(); i++){
-        q.push(i);
-    }
-
-    while(q.size() != 0){
-        ll u = q.top();
+    while(!q.empty()){
+       nodo u = q.top();
         q.pop();
-
-        for(nodo v: g[u]){
-            relax(u,v,d);
+        ll peso1 = peso(u);
+        if(d[nombre(u)]< peso1) continue ;
+        for(nodo v: g[nombre(u)]){
+            if(d[nombre(v)] > d[nombre(u)] + peso(v)){
+                d[nombre(v)] = d[nombre(u)] + peso(v);
+                q.push(make_tuple(d[nombre(v)], nombre(v)));
+                // DECREsEKEY?DEL QUEUEUUE
+            }
         }
     }
 }
-
-//priority_queue <int, vector<int>, greater<int>> gq; //Hago min heap
 
 ll minimores(vector<calleBi> &nuevasCalles)
 {
@@ -107,47 +86,52 @@ ll minimores(vector<calleBi> &nuevasCalles)
         ll ida2 = dT[nombre(nuevasCalles[i])];
         ll vuelta2 = d[llegada(nuevasCalles[i])];
 
-        if (minimo >= (ida + costo + vuelta))
-        {
-            minimo = (ida + costo + vuelta);
-        } else if(minimo >= (ida2 + costo + vuelta2)){
-            minimo = (ida2 + costo + vuelta2);
-        }
-
+        minimo = min(minimo, min(ida + costo + vuelta, ida2 + costo + vuelta2));
     }
     return minimo;
 }
 
 
 int main(){
+    int loop;
+    cin >> loop;
 
-    cin >> N >> M >> k >> s >> t;
+    while(loop>0){
 
-    Grafo = grafo(N);
-    GrafoT = grafo(N);
+        cin >> N >> M >> k >> s >> t;
+        Grafo.clear();         Grafo = vector<set<nodo>>(N);
+        GrafoT.clear();        GrafoT = vector<set<nodo>>(N);
+        d.clear();             d = vector<ll>(N, inf);
+        dT.clear();            dT = vector<ll>(N, inf);
 
-    d = vector<ll>(N);
-    dT = vector<ll>(N);
+        ll di, ci, li;
+        for(int i = 0; i < M ; i++){
+            cin >> di >> ci >> li;
 
-    ll di, ci, li;
-    for(int i = 0; i < M ; i++){   
-        cin >> di >> ci >> li;
+            Grafo[di -1].insert(make_tuple(li, ci - 1));
+            GrafoT[ci -1].insert(make_tuple(li, di - 1));
+        }
 
-        Grafo[di -1].insert(make_tuple(li, ci - 1));
-        GrafoT[ci -1].insert(make_tuple(li, di - 1));
+        dijkstra(Grafo, s - 1, d);
+        dijkstra(GrafoT, t - 1, dT);
+
+       vector<calleBi> nuevasCalles = {};
+        ll ui, vi, qi;
+        for(int i = 0; i < k ; i++){
+            cin >> ui >> vi >> qi;
+            nuevasCalles.push_back(make_tuple(qi, ui-1, vi-1));
+        }
+
+        ll res = minimores(nuevasCalles);
+        if(res == inf){
+            res = -1;
+        }
+
+        nuevasCalles.clear();
+
+        cout << res << endl;
+
+        loop--;
     }
-
-    vector<calleBi> nuevasCalles = {};
-    ll ui, vi, qi;
-    for(int i = 0; i < k ; i++){
-        cin >> ui >> vi >> qi;
-        nuevasCalles.push_back(make_tuple(qi, ui-1, vi-1));
-    }
-
-    dijkstra(Grafo, s - 1, d);
-    dijkstra(GrafoT, t - 1, dT);
-
-    ll res = minimores(nuevasCalles);
-    cout << res;
     // std::cout << std::setprecision(5) << res;
 }
